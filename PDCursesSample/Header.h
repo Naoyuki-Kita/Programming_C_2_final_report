@@ -37,4 +37,6 @@ void print_maze(Maze maze);
 
 void tprint_maze(Maze maze);
 
-void move_man(Maze* maze, int key);
+
+int move_man(Maze* maze, int key);
+

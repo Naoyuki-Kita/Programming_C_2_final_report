@@ -13,7 +13,7 @@
 #define OUT 9
 #define BUFFSIZE 128
 
-// 0‚ª’Ê˜HA1‚ª•ÇA2‚ªlA3‚ªƒS[ƒ‹A9‚ª—ÌˆæŠO
+// 0ãŒé€šè·¯ã€1ãŒå£ã€2ãŒäººã€3ãŒã‚´ãƒ¼ãƒ«ã€9ãŒé ˜åŸŸå¤–
 
 enum  Direction { UP, DOWN, RIGHT, LEFT };
 
@@ -38,8 +38,9 @@ Maze init_maze(int height, int width) {
 			maze.data[x][y] = OUT;
 		}
 	}
-	
-	for (int x = 0; x < height; x++) {;
+
+	for (int x = 0; x < height; x++) {
+		;
 		for (int y = 0; y < width; y++) {
 			set_num(&maze, x, y, WALL);
 		}
@@ -49,12 +50,12 @@ Maze init_maze(int height, int width) {
 
 
 void set_num(Maze* maze, int x, int y, int num) {
-	maze->data[x+1][y+1] = num;
+	maze->data[x + 1][y + 1] = num;
 }
 
 
 int get_num(Maze* maze, int x, int y) {
-	return maze->data[x+1][y+1];
+	return maze->data[x + 1][y + 1];
 }
 
 int dig(Maze* maze, int x, int y) {
@@ -147,14 +148,14 @@ void set_goal(Maze* maze) {
 	for (int sum = maze->height + maze->width; sum > 0; sum--) {
 		for (x = maze->height; x > 0; x--) {
 			y = sum - x;
-			if (y < maze->width &&get_num(maze, x, y) == PATH) goto break_state;
+			if (y < maze->width && get_num(maze, x, y) == PATH) goto break_state;
 		}
 	}
 break_state:
 	maze->goal_x = x;
 	maze->goal_y = y;
 	set_num(maze, maze->goal_x, maze->goal_y, GOAL);
-	
+
 	refresh();
 	print_maze(*maze);
 }
@@ -165,19 +166,19 @@ void print_maze(Maze maze) {
 		for (int y = 0; y < maze.width; y++) {
 			switch (get_num(&maze, x, y)) {
 			case PATH:
-				mvaddstr(x, 2*y, "@");
+				mvaddstr(x, 2 * y, "ã€€");
 				break;
 			case WALL:
-				mvaddstr(x, 2*y, "¡");
+				mvaddstr(x, 2 * y, "â– ");
 				break;
 			case MAN:
-				mvaddstr(x, 2*y, "l");
+				mvaddstr(x, 2 * y, "äºº");
 				break;
 			case GOAL:
-				mvaddstr(x, 2*y, "o");
+				mvaddstr(x, 2 * y, "å‡º");
 				break;
 			case OUT:
-				mvaddstr(x, 2*y, "H");
+				mvaddstr(x, 2 * y, "ï¼Ÿ");
 				break;
 			}
 		}
@@ -190,19 +191,19 @@ void tprint_maze(Maze maze) {
 		for (int y = 0; y < maze.width; y++) {
 			switch (get_num(&maze, x, y)) {
 			case PATH:
-				fprintf_s(stdout,  "@");
+				fprintf_s(stdout, "ã€€");
 				break;
 			case WALL:
-				fprintf_s(stdout, "¡");
+				fprintf_s(stdout, "â– ");
 				break;
 			case MAN:
-				fprintf_s(stdout, "l");
+				fprintf_s(stdout, "äºº");
 				break;
 			case GOAL:
-				fprintf_s(stdout, "o");
+				fprintf_s(stdout, "å‡º");
 				break;
 			case OUT:
-				fprintf_s(stdout, "H");
+				fprintf_s(stdout, "ï¼Ÿ");
 				break;
 			}
 		}
@@ -210,9 +211,10 @@ void tprint_maze(Maze maze) {
 	}
 }
 
-void move_man(Maze* maze, int key) {
+int move_man(Maze* maze, int key) {
 	int prev_x = maze->player_x;
 	int prev_y = maze->player_y;
+	int answer = 1;
 	switch (key) {
 	case KEY_UP:
 		maze->player_x--;
@@ -230,9 +232,11 @@ void move_man(Maze* maze, int key) {
 	if (get_num(maze, maze->player_x, maze->player_y) == WALL) {
 		maze->player_x = prev_x;
 		maze->player_y = prev_y;
+		answer = 0;
 	}
 	set_num(maze, prev_x, prev_y, PATH);
 	set_num(maze, maze->player_x, maze->player_y, MAN);
 	refresh();
 	print_maze(*maze);
+	return answer;
 }

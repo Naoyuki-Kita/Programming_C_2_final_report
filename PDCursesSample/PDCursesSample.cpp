@@ -1,4 +1,4 @@
-﻿// PDCursesSample.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
+// PDCursesSample.cpp : このファイルには 'main' 関数が含まれています。プログラム実行の開始と終了がそこで行われます。
 
 #include <stdio.h>
 #include <curses.h>
@@ -17,28 +17,29 @@
 
 int main() {
 
-	/*char currentDirectory[BUFFSIZE];
+	int height = -1;
+	int width = -1;
+	int key = 0;
+	int move_ctr = 0;
+	char buff[BUFFSIZE];
+
+	char currentDirectory[BUFFSIZE];
 	getCurrentDirectory(currentDirectory);
-	fprintf_s(stdout, currentDirectory);
 	char section[BUFFSIZE];
 	sprintf_s(section, "section1");
 	char height_label[BUFFSIZE];
 	sprintf_s(height_label, "height");
 	char width_label[BUFFSIZE];
-	sprintf_s(width_label, "label");
+	sprintf_s(width_label, "width");
 	char settingFile[BUFFSIZE];
-	sprintf_s(settingFile, "%s¥¥setting.ini", currentDirectory);
-    int height = GetPrivateProfileInt(section, height_label, -1, settingFile);
-	int width = GetPrivateProfileInt(section, width_label, -1, settingFile);*/
-
-	const int height = 30;
-	const int width = 30;
-
-	int key = 0;
+	sprintf_s(settingFile, "%s\\settings.ini", currentDirectory);
+	height = GetPrivateProfileInt(section, height_label, -1, settingFile);
+	width = GetPrivateProfileInt(section, width_label, -1, settingFile);
 
 	initscr();
 	noecho();
 	cbreak();
+
 
 	/*start state=================================================*/
 	mvaddstr(10, 10, "MAZE by K.N.");
@@ -58,33 +59,15 @@ int main() {
 	dig_maze(&maze, start_x, start_y);
 	init_man(&maze);
 	set_goal(&maze);
-	/*============================================================*/
-	
 
-	/*playing state===============================================*/
-	keypad(stdscr, TRUE);
-	while (true) {
-		key = getch();
-		move_man(&maze, key);
-		if (maze.player_x == maze.goal_x && maze.player_y == maze.goal_y) break;
-	}
-	/*============================================================*/
-
-
-	/*end state===================================================*/
-	endwin();
-	fprintf_s(stdout, "maze status:\n");
-	fprintf_s(stdout, "\tgoal_x\t%d\n", maze.goal_x);
-	fprintf_s(stdout, "\tgoal_y\t%d\n", maze.goal_y);
-
-	/*FILE* fp;
+	FILE* fp;
 	errno_t error = fopen_s(&fp, "result.txt", "w");
 	if (error != 0) {
-		fprintf_s(stderr, "failed to open");
+		fprintf_s(stderr, "failed to open\n");
 	}
 	else
 	{
-		fprintf_s(stdout, "success to open");
+		fprintf_s(stdout, "success to open\n");
 		for (int x = 0; x < maze.height; x++) {
 			for (int y = 0; y < maze.width; y++) {
 				switch (get_num(&maze, x, y)) {
@@ -107,9 +90,39 @@ int main() {
 			}
 			fputs("\n", fp);
 		}
-		fclose(fp);
-	}*/
 	/*============================================================*/
+
+	/*playing state===============================================*/
+		keypad(stdscr, TRUE);
+		while (true) {
+			key = getch();
+			if (move_man(&maze, key) != 0) move_ctr++;
+			if (maze.player_x == maze.goal_x && maze.player_y == maze.goal_y) break;
+		}
+	/*============================================================*/
+
+	/*end state===================================================*/
+		endwin();
+	
+		sprintf_s(buff, "移動回数:  %d\n", move_ctr);
+		fputs(buff, fp);
+
+		fclose(fp);
+	/*============================================================*/
+	}
+	
+
+
+	
+	
+	
+
+
+	
+	
+
+	
+	
 
 	tprint_maze(maze);
 
