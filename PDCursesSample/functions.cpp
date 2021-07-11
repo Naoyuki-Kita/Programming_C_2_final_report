@@ -13,7 +13,7 @@
 #define OUT 9
 #define BUFFSIZE 128
 
-// 0‚ª’Ê˜HA1‚ª•ÇA2‚ªlA3‚ªƒS[ƒ‹A9‚ª—ÌˆæŠO
+// 0ãŒé€šè·¯ã€1ãŒå£ã€2ãŒäººã€3ãŒã‚´ãƒ¼ãƒ«ã€9ãŒé ˜åŸŸå¤–
 
 enum  Direction { UP, DOWN, RIGHT, LEFT };
 
@@ -166,19 +166,19 @@ void print_maze(Maze maze) {
 		for (int y = 0; y < maze.width; y++) {
 			switch (get_num(&maze, x, y)) {
 			case PATH:
-				mvaddstr(x, 2 * y, "@");
+				mvaddstr(x, 2 * y, "ã€€");
 				break;
 			case WALL:
-				mvaddstr(x, 2 * y, "¡");
+				mvaddstr(x, 2 * y, "â– ");
 				break;
 			case MAN:
-				mvaddstr(x, 2 * y, "l");
+				mvaddstr(x, 2 * y, "äºº");
 				break;
 			case GOAL:
-				mvaddstr(x, 2 * y, "o");
+				mvaddstr(x, 2 * y, "å‡º");
 				break;
 			case OUT:
-				mvaddstr(x, 2 * y, "H");
+				mvaddstr(x, 2 * y, "ï¼Ÿ");
 				break;
 			}
 		}
@@ -191,19 +191,19 @@ void tprint_maze(Maze maze) {
 		for (int y = 0; y < maze.width; y++) {
 			switch (get_num(&maze, x, y)) {
 			case PATH:
-				fprintf_s(stdout, "@");
+				fprintf_s(stdout, "ã€€");
 				break;
 			case WALL:
-				fprintf_s(stdout, "¡");
+				fprintf_s(stdout, "â– ");
 				break;
 			case MAN:
-				fprintf_s(stdout, "l");
+				fprintf_s(stdout, "äºº");
 				break;
 			case GOAL:
-				fprintf_s(stdout, "o");
+				fprintf_s(stdout, "å‡º");
 				break;
 			case OUT:
-				fprintf_s(stdout, "H");
+				fprintf_s(stdout, "ï¼Ÿ");
 				break;
 			}
 		}
