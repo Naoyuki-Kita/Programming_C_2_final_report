@@ -1,20 +1,24 @@
 #pragma once
 
-#define BUFFSIZE 128
-#define MAX_HEIGHT 50
-#define MAX_WIDTH 50
+#define MAX_HEIGHT 50		//迷路の最大の縦の長さ
+#define MAX_WIDTH 80		//迷路の最大の横の長さ
 
-
+/*
+	Maze型構造体定義
+先に要素数が定まったint型二次元配列dataとしてメモリを確保しておき、
+初期化時に迷路の情報としてコンソール出力する範囲を決める
+*/
 struct Maze {
-	int height;
-	int width;
-	int player_x;
-	int player_y;
-	int goal_x;
-	int goal_y;
-	int data[MAX_HEIGHT][MAX_WIDTH];
+	int height;							//迷路の縦の長さ
+	int width;							//迷路の横の長さ
+	int player_x;						//人間がいる位置の縦の座標
+	int player_y;						//人間がいる位置の横の座標
+	int goal_x;							//ゴール位置の縦の座標
+	int goal_y;							//ゴール位置の横の座標
+	int data[MAX_HEIGHT][MAX_WIDTH];	//迷路の情報
 };
 
+//各種関数のプロトタイプ宣言
 void getCurrentDirectory(char* currentDirectory);
 
 Maze init_maze(int height, int width);
@@ -35,6 +39,6 @@ void set_goal(Maze* maze);
 
 void print_maze(Maze maze);
 
-void tprint_maze(Maze maze);
-
 int move_man(Maze* maze, int key);
+
+int isDead_end(Maze* maze, int x, int y);
