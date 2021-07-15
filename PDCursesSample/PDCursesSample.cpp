@@ -25,6 +25,7 @@ int main() {
 	int play_ms = 0;		//プレイ時間を計測する変数(単位：ミリ秒)
 	double play_time = 0.0;	//プレイ時間を計測する変数(単位：秒)
 	char buff[BUFFSIZE];	//文字列保存用の配列
+	int play_ctr = 1;		//プレイした回数のカウンタ
 
 	//制御端末の開始
 	initscr();
@@ -32,6 +33,7 @@ int main() {
 	cbreak();
 
 	/*start state=================================================*/
+start_state:
 	mvaddstr(10, 10, "MAZE by K.N.");
 	mvaddstr(11, 10, "SELECT MODE");
 	mvaddstr(12, 10, "1. EASY");
@@ -81,14 +83,23 @@ int main() {
 	init_man(&maze);
 	set_goal(&maze);
 
-	//出力ファイル"result.txt"に出力
+	
 	FILE* fp;
-	errno_t error = fopen_s(&fp, "result.txt", "w");
+	//初回のみ出力ファイル"result.txt"の内容を消去
+	if (play_ctr == 1) {
+		errno_t tmp_error = fopen_s(&fp, "result.txt", "w");
+		fclose(fp);
+	}
+
+	//出力ファイルへの書き込み(複数回プレイする場合のために追加モードで出力)
+	errno_t error = fopen_s(&fp, "result.txt", "a");
 	if (error != 0) {
 		fprintf_s(stderr, "failed to open\n");
 	}
 	else
 	{
+		sprintf_s(buff, "%d回目:\n", play_ctr);
+		fputs(buff, fp);
 		//迷路の形状を出力
 		for (int x = 0; x < maze.height; x++) {
 			for (int y = 0; y < maze.width; y++) {
@@ -128,20 +139,40 @@ int main() {
 	/*============================================================*/
 
 	/*end state===================================================*/
-		endwin();
+		erase();
+		refresh();
+		mvaddstr(9, 10, "Game Clear");
 		play_time = (double)play_ms / 1000;
 
-		//移動回数の書き込み
+		//プレイ時間の表示, 書き込み
 		sprintf_s(buff, "プレイ時間:\t%.2f秒\n", play_time);
-		fputs(buff, fp);
-		sprintf_s(buff, "移動回数:\t%d回\n", move_ctr);
+		mvaddstr(10,10,buff);
 		fputs(buff, fp);
 
-		fclose(fp);
+		//移動回数の表示, 書き込み
+		sprintf_s(buff, "移動回数:\t%d回\n\n", move_ctr);
+		mvaddstr(11, 10, buff);
+		fputs(buff, fp);
+
+		//もう一度プレイするか選択(eかcのみ受け付け)
+		mvaddstr(12, 10, "PRESS C TO CONTINUE");
+		mvaddstr(13, 10, "      E TO EXIT");
+		fclose(fp);		//プレイする場合fopenでエラーを吐かないように一旦閉じる
+		refresh();
+		while (1) {
+			key = getch();
+			if (key == 'c') {
+				erase();
+				refresh();
+				play_ctr++;			//プレイ回数に+1
+				goto start_state;	//start_stateからやり直す
+			}
+			else if (key == 'e') {
+				break;
+			}
+		}
+		endwin();
 	}
-	//コンソール出力して終了
-	fprintf_s(stdout, "プレイ時間:\t%.2f秒\n", play_time);
-	fprintf_s(stdout, "移動回数:\t%d回\n", move_ctr);
 	/*============================================================*/
 	
 

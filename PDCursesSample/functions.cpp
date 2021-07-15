@@ -321,22 +321,32 @@ return:
 */
 void print_maze(Maze maze) {
 	erase();
+	start_color();
+	init_pair(1, COLOR_WHITE, COLOR_BLACK);   //色1 は黒地に白文字
+	init_pair(2, COLOR_RED, COLOR_BLACK);	// 色2 は黒地に赤文字
+	init_pair(3, COLOR_WHITE, COLOR_BLUE);	// 色3 は黒地に青文字
+	mvaddstr(0, 0, "十字キーで移動");
 	for (int x = 0; x < maze.height; x++) {
 		for (int y = 0; y < maze.width; y++) {
 			switch (get_num(&maze, x, y)) {
 			case PATH:
-				mvaddstr(x, 2 * y, "　");
+				attrset(COLOR_PAIR(1));
+				mvaddstr(x + 1, 2 * y, "　");
 				break;
 			case WALL:
-				mvaddstr(x, 2 * y, "■");
+				attrset(COLOR_PAIR(1));
+				mvaddstr(x + 1, 2 * y, "■");
 				break;
 			case MAN:
-				mvaddstr(x, 2 * y, "人");
+				attrset(COLOR_PAIR(2));
+				mvaddstr(x + 1, 2 * y, "人");
 				break;
 			case GOAL:
-				mvaddstr(x, 2 * y, "出");
+				attrset(COLOR_PAIR(3));
+				mvaddstr(x + 1, 2 * y, "出");
 				break;
 			case OUT:
+				attrset(COLOR_PAIR(1));
 				mvaddstr(x, 2 * y, "？");
 				break;
 			}
