@@ -34,6 +34,7 @@ int main() {
 
 	/*start state=================================================*/
 start_state:
+	//スタート画面の表示
 	mvaddstr(10, 10, "MAZE by K.N.");
 	mvaddstr(11, 10, "SELECT MODE");
 	mvaddstr(12, 10, "1. EASY");
@@ -47,10 +48,12 @@ start_state:
 		}
 	}
 	/*============================================================*/
+
+
 	//設定ファイルから各種設定を読み込む
-	char currentDirectory[BUFFSIZE];
+	char currentDirectory[BUFFSIZE];		//カレントディレクトリ
 	getCurrentDirectory(currentDirectory);
-	char section[BUFFSIZE];
+	char section[BUFFSIZE];							//セクション名(入力によって変化)
 	if(key == '1') sprintf_s(section, "section1");
 	if(key == '2') sprintf_s(section, "section2");
 	if(key == '3') sprintf_s(section, "section3");
@@ -65,10 +68,11 @@ start_state:
 
 
 	/*creating maze===============================================*/
-	//実行時間を用いて乱数を初期化
+	//実行時間を用いて乱数を初期化(start_stateで入力させるため実行時間が代わりランダム性が保たれる(はず))
 	srand((unsigned int)clock());
 
-	//ランダムに穴掘り法の開始位置を決定
+	//ランダムに穴掘り法の開始位置を決定(奇数に限定)
+	//reference: http://www.ced.is.utsunomiya-u.ac.jp/lecture/2009/prog/p3/kadai4/5.html
 	int start_x = 2 * (rand() % ((height / 2) - 1)) + 1;
 	int start_y = 2 * (rand() % ((width / 2) - 1)) + 1;
 
@@ -125,24 +129,27 @@ start_state:
 		}
 	/*============================================================*/
 
+
 	/*playing state===============================================*/
 		keypad(stdscr, TRUE);	//十字キーの入力を受け付け
-		play_ms = clock();
+		play_ms = clock();		//プレイ開始時の実行時間を取得
 		while (true) {
 			key = getch();
 			if (move_man(&maze, key) != 0) move_ctr++;	//移動したらインクリメント
 			if (maze.player_x == maze.goal_x && maze.player_y == maze.goal_y) {
-				play_ms = clock() - play_ms;
+				//ゴールしたら終了
+				play_ms = clock() - play_ms;	//終了時の実行時間との差分からプレイ時間を算出
 				break;
-			}	//ゴールしたら終了
+			}
 		}
 	/*============================================================*/
+
 
 	/*end state===================================================*/
 		erase();
 		refresh();
 		mvaddstr(9, 10, "Game Clear");
-		play_time = (double)play_ms / 1000;
+		play_time = (double)play_ms / 1000;		//ミリ秒から秒に単位を変換
 
 		//プレイ時間の表示, 書き込み
 		sprintf_s(buff, "プレイ時間:\t%.2f秒\n", play_time);
@@ -159,7 +166,7 @@ start_state:
 		mvaddstr(13, 10, "      E TO EXIT");
 		fclose(fp);		//プレイする場合fopenでエラーを吐かないように一旦閉じる
 		refresh();
-		while (1) {
+		while (1) {		//'c'か'e'が入力されるまで待機
 			key = getch();
 			if (key == 'c') {
 				erase();

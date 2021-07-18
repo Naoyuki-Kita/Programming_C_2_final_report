@@ -66,7 +66,7 @@ Maze init_maze(int height, int width) {
 	/*
 	各種属性への代入
 		　人間の位置については、init_man関数に不具合が生じ
-		変数が代入されなかったときに分かりやすいように, 
+		変数が代入されなかったときに気づきやすいように, 
 		存在しえない座標である(-1, -1)を初期値として代入
 
 		　同様に、ゴール位置にも(-2, -2)を初期値として代入
@@ -150,9 +150,7 @@ return:
 	・http://www.ced.is.utsunomiya-u.ac.jp/lecture/2009/prog/p3/kadai4/5.html
 */
 int dig(Maze* maze, int x, int y) {
-	//掘ることのできるマスの条件についてはREADME.txtを参照
-
-	int wall_ctr = 0;		//掘りたいマスの周りの壁を数える変数
+	//掘ることのできるマスの条件については"1116191025_設計説明書.pdf"を参照
 
 	if (get_num(maze, x, y) != WALL) return 0;	//掘るマスが壁でなかったら掘らずに終了
 
@@ -162,6 +160,7 @@ int dig(Maze* maze, int x, int y) {
 	if (get_num(maze, x + 1, y) == OUT) return 0;
 	if (get_num(maze, x - 1, y) == OUT) return 0;
 
+	//行き止まり(周囲の4方のうち掘り進めてきた方向を除いた3方がWALLの場所)なら掘る
 	if (isDead_end(maze, x, y) == 1) {
 		set_num(maze, x, y, PATH);
 		return 1;
@@ -181,7 +180,7 @@ return:
 	void
 
 <remarks>
-	・詳しくはREADME.txtを参照
+	・詳しくは"1116191025_設計説明書.pdf"を参照
 
 <reference>
 	・http://www.ced.is.utsunomiya-u.ac.jp/lecture/2009/prog/p3/kadai4/5.html
@@ -193,12 +192,13 @@ void dig_maze(Maze* maze, int start_x, int start_y) {
 	refresh();
 	print_maze(*maze);
 
-	Sleep(1);
+	Sleep(1);	//途中経過を表示する際画面のちらつきが激しいので処理を一瞬止めてちらつきを軽減
 
-	int dir_array[] = { UP, DOWN, RIGHT, LEFT };
-	shuffle(dir_array, 4, (unsigned int)clock());
+	int dir_array[] = { UP, DOWN, RIGHT, LEFT };		//方向を指し示す配列
+	shuffle(dir_array, 4, (unsigned int)clock());		//シャッフル(ランダム性を保つためシード値は毎回更新)
 
 	for (int i = 0; i < 4; i++) {
+		//シャッフル後の配列の順に掘ることを試す
 		erase();
 		if (dir_array[i] == UP && dig(maze, start_x, (start_y - 1)) == 1) {
 			dig_maze(maze, start_x, (start_y - 1));
@@ -253,15 +253,15 @@ return:
 	void
 
 <remarks>
-	・配置位置は左上になる
+	・配置位置は左上にある行き止まり(周囲の4方のうち3方がWALLの場所)になる
 
 */
 
 void init_man(Maze* maze) {
-
 	int x = -1;
 	int y = -1;
 
+	//迷路の左上から走査し、条件にあうマスがあればbreak_stateに行く(breakだと内側のfor文しか抜けない)
 	for (int sum = 0; sum < min(maze->height, maze->width); sum++) {
 		for (x = 0; x < sum; x++) {
 			y = sum - x;
@@ -288,13 +288,14 @@ return:
 	void
 
 <remarks>
-	・配置位置は最も右下の道上になる
+	・配置位置は右下にある行き止まり(周囲の4方のうち3方がWALLの場所)になる
 
 */
 void set_goal(Maze* maze) {
 	int x = -2;
 	int y = -2;
 
+	//迷路の右下から走査し、条件にあうマスがあればbreak_stateに行く(breakだと内側のfor文しか抜けない)
 	for (int sum = maze->height + maze->width; sum > 0; sum--) {
 		for (x = maze->height; x > 0; x--) {
 			y = sum - x;
@@ -328,6 +329,7 @@ void print_maze(Maze maze) {
 	mvaddstr(0, 0, "十字キーで移動");
 	for (int x = 0; x < maze.height; x++) {
 		for (int y = 0; y < maze.width; y++) {
+			//dataの要素に従いコンソール出力(全角文字のためy座標を2倍して被らないようにしている)
 			switch (get_num(&maze, x, y)) {
 			case PATH:
 				attrset(COLOR_PAIR(1));
@@ -387,6 +389,7 @@ int move_man(Maze* maze, int key) {
 		break;
 	}
 	if (get_num(maze, maze->player_x, maze->player_y) == WALL) {
+		//移動後の座標がWALLだったら移動をキャンセルし失敗とする
 		maze->player_x = prev_x;
 		maze->player_y = prev_y;
 		answer = 0;
@@ -399,7 +402,7 @@ int move_man(Maze* maze, int key) {
 }
 
 /*
-isDead_end:	指定したマスが行き止まりかどうかを判断する
+isDead_end:	指定したマスが行き止まり(周囲の4方のうち3方がWALLの場所)かどうかを判断する
 
 inputs:
 	maze:Maze*	データ参照元のMaze型構造体
